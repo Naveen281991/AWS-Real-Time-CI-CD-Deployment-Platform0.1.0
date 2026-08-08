@@ -1,0 +1,29 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+    commands:
+      - echo "Installing application dependencies..."
+      - cd application
+      - npm ci
+
+  pre_build:
+    commands:
+      - echo "Running automated tests..."
+      - npm test
+
+  build:
+    commands:
+      - echo "Build phase started..."
+      - echo "Application build completed."
+
+  post_build:
+    commands:
+      - echo "CI build completed successfully."
+
+artifacts:
+  files:
+    - '**/*'
+  discard-paths: no

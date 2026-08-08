@@ -1,0 +1,17 @@
+version: 0.0
+os: linux
+
+files:
+  - source: application/
+    destination: /opt/aws-cicd-application/
+
+hooks:
+  ApplicationStart:
+    - location: deployment/scripts/application_start.sh
+      timeout: 60
+      runas: root
+
+  ValidateService:
+    - location: deployment/scripts/validate_service.sh
+      timeout: 60
+      runas: root
