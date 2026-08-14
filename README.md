@@ -175,3 +175,23 @@ AUTOMATE:
                   │
                   ▼
              Live App 🚀
+
+             
+
+             1. Change application code
+        ↓
+2. Commit to main
+        ↓
+3. git push
+        ↓
+4. CodePipeline automatically starts
+        ↓
+5. CodeBuild runs tests
+        ↓
+6. Docker image built
+        ↓
+7. Image pushed to ECR
+        ↓
+8. ECS service deploys new image
+        ↓
+9. ALB serves new version
