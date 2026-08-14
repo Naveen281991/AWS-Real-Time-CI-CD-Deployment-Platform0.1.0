@@ -52,3 +52,25 @@ output "ec2_public_dns" {
   description = "Public DNS name of the CI/CD application EC2 instance"
   value       = aws_instance.application.public_dns
 }
+
+
+output "ecr_repository_name" {
+  description = "ECR repository name for the application"
+  value       = aws_ecr_repository.application.name
+}
+
+output "ecr_repository_url" {
+  description = "ECR repository URL for the application"
+  value       = aws_ecr_repository.application.repository_url
+}
+
+output "ecr_repository_arn" {
+  description = "ECR repository ARN for the application"
+  value       = aws_ecr_repository.application.arn
+}
+
+
+output "alb_dns_name" {
+  description = "Public DNS name of the application load balancer"
+  value       = aws_lb.application.dns_name
+}

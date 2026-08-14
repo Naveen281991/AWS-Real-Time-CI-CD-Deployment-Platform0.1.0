@@ -71,3 +71,107 @@ The `/health` endpoint is used for deployment validation.
 Initial application and CI/CD configuration completed.
 
 Infrastructure deployment is being developed using Terraform.
+
+
+
+LAYERS: 
+
+1. AWS account/region verification
+2. Terraform provider
+3. VPC/network
+4. Security group
+5. IAM roles
+6. S3 artifact bucket
+7. EC2
+8. CodeDeploy
+9. CodeBuild
+10. CodePipeline
+11. GitHub connection
+12. First automatic deployment
+
+
+EC2 Security Group:
+
+| Traffic  | Port | Source                  | Purpose                   |
+| -------- | ---: | ----------------------- | ------------------------- |
+| SSH      |   22 | **Your public IP only** | Administration            |
+| HTTP     |   80 | `0.0.0.0/0`             | Application access        |
+| HTTPS    |  443 | `0.0.0.0/0`             | Future TLS                |
+| Outbound |  All | `0.0.0.0/0`             | Updates/package downloads |
+
+
++--------------+-------------------------------+
+|  Name        |  aws-cicd-application-server  |
+|  Application |  AWS-Enterprise-CICD-App      |
+|  Role        |  application                  |
+|  Project     |  AWS-Enterprise-CICD          |
+|  Environment |  production                   |
+|  ManagedBy   |  Terraform                    |
+
+
+{                                                                                                                                           
+    "deploymentGroupInfo": {
+        "applicationName": "AWS-Enterprise-CICD-App",
+        "deploymentGroupId": "3c5ebc3c-9c67-49e3-8137-68388350c412",
+        "deploymentGroupName": "AWS-Enterprise-CICD-DeploymentGroup",
+        "deploymentConfigName": "CodeDeployDefault.AllAtOnce",
+        "ec2TagFilters": [
+            {
+                "Key": "Project",
+                "Value": "AWS-Enterprise-CICD",
+                "Type": "KEY_AND_VALUE"
+
+
+                Understand appspec.yml
+
+This is the deployment lifecycle:
+
+CodeDeploy
+    │
+    ▼
+ApplicationStop
+    │
+    ▼
+BeforeInstall
+    │
+    ▼
+Copy application files
+    │
+    ▼
+AfterInstall
+    │
+    ▼
+ApplicationStart
+    │
+    ▼
+ValidateService
+
+
+AUTOMATE: 
+
+              Developer
+                  │
+                  ▼
+               GitHub
+                  │
+             CodePipeline
+                  │
+                  ▼
+              CodeBuild
+                  │
+          ┌───────┴────────┐
+          │                │
+       npm test        Docker build
+          │                │
+          └───────┬────────┘
+                  ▼
+                 ECR
+                  │
+                  ▼
+             ECS Fargate
+                  │
+                  ▼
+                 ALB
+                  │
+                  ▼
+             Live App 🚀

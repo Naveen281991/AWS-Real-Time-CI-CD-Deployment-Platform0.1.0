@@ -1,5 +1,11 @@
 version: 0.2
 
+env:
+  variables:
+    AWS_DEFAULT_REGION: "us-east-1"
+    ECR_REPOSITORY: "aws-enterprise-cicd-app"
+    CONTAINER_NAME: "aws-enterprise-cicd-app"
+
 phases:
   install:
     runtime-versions:
@@ -8,22 +14,36 @@ phases:
       - echo "Installing application dependencies..."
       - cd application
       - npm ci
+      - cd ..
 
   pre_build:
     commands:
       - echo "Running automated tests..."
+      - cd application
       - npm test
+      - cd ..
+      - echo "Logging in to Amazon ECR..."
+      - AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - ECR_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPOSITORY}
+      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_URI}
 
   build:
     commands:
-      - echo "Build phase started..."
-      - echo "Application build completed."
+      - echo "Building Docker image..."
+      - IMAGE_TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}
+      - docker build -t ${ECR_URI}:${IMAGE_TAG} .
+      - docker tag ${ECR_URI}:${IMAGE_TAG} ${ECR_URI}:latest
 
   post_build:
     commands:
+      - echo "Pushing Docker image to ECR..."
+      - docker push ${ECR_URI}:${IMAGE_TAG}
+      - docker push ${ECR_URI}:latest
+      - echo "Generating ECS deployment artifact..."
+      - printf '[{"name":"%s","imageUri":"%s"}]' "${CONTAINER_NAME}" "${ECR_URI}:${IMAGE_TAG}" > imagedefinitions.json
       - echo "CI build completed successfully."
 
 artifacts:
   files:
-    - '**/*'
-  discard-paths: no
+    - imagedefinitions.json
+  discard-paths: yes

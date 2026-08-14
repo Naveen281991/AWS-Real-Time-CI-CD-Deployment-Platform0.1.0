@@ -1,17 +1,33 @@
 version: 0.0
+
 os: linux
 
 files:
   - source: application/
-    destination: /opt/aws-cicd-application/
+    destination: /opt/aws-cicd/application/
 
 hooks:
+  ApplicationStop:
+    - location: deployment/scripts/stop_application.sh
+      timeout: 60
+      runas: root
+
+  BeforeInstall:
+    - location: deployment/scripts/prepare_application.sh
+      timeout: 120
+      runas: root
+
+  AfterInstall:
+    - location: deployment/scripts/install_dependencies.sh
+      timeout: 300
+      runas: root
+
   ApplicationStart:
-    - location: deployment/scripts/application_start.sh
+    - location: deployment/scripts/start_application.sh
       timeout: 60
       runas: root
 
   ValidateService:
-    - location: deployment/scripts/validate_service.sh
+    - location: deployment/scripts/validate_application.sh
       timeout: 60
       runas: root

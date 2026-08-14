@@ -22,6 +22,40 @@ resource "aws_iam_role" "ec2_codedeploy" {
   }
 }
 
+
+resource "aws_iam_role_policy" "ec2_codedeploy_s3" {
+  name = "AWS-CICD-EC2-CodeDeploy-S3-Read"
+  role = aws_iam_role.ec2_codedeploy.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Sid    = "ReadCICDArtifacts"
+        Effect = "Allow"
+
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion"
+        ]
+
+        Resource = "${aws_s3_bucket.artifacts.arn}/*"
+      },
+      {
+        Sid    = "ListCICDArtifacts"
+        Effect = "Allow"
+
+        Action = [
+          "s3:ListBucket"
+        ]
+
+        Resource = aws_s3_bucket.artifacts.arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "ec2_ssm" {
   role       = aws_iam_role.ec2_codedeploy.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
