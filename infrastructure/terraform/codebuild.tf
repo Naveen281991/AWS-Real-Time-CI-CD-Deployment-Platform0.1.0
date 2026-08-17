@@ -27,7 +27,7 @@ resource "aws_iam_role_policy" "codebuild" {
   policy = jsonencode({
     Version = "2012-10-17"
 
-    Statement = [
+        Statement = [
       {
         Sid    = "CloudWatchLogs"
         Effect = "Allow"
@@ -73,6 +73,28 @@ resource "aws_iam_role_policy" "codebuild" {
         ]
 
         Resource = "*"
+      },
+      {
+        Sid    = "CodePipelineArtifactRead"
+        Effect = "Allow"
+
+        Action = [
+          "s3:GetObject",
+          "s3:GetObjectVersion"
+        ]
+
+        Resource = "${aws_s3_bucket.artifacts.arn}/*"
+      },
+      {
+        Sid    = "CodePipelineArtifactBucket"
+        Effect = "Allow"
+
+        Action = [
+          "s3:GetBucketVersioning",
+          "s3:ListBucket"
+        ]
+
+        Resource = aws_s3_bucket.artifacts.arn
       }
     ]
   })
