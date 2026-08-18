@@ -74,8 +74,15 @@ resource "aws_iam_role_policy" "codepipeline" {
         Action = [
           "ecs:DescribeServices",
           "ecs:DescribeTaskDefinition",
+          "ecs:DescribeTaskSets",
+          "ecs:DescribeClusters",
+          "ecs:ListTasks",
+          "ecs:ListTaskDefinitions",
           "ecs:RegisterTaskDefinition",
-          "ecs:UpdateService"
+          "ecs:DeregisterTaskDefinition",
+          "ecs:UpdateService",
+          "ecs:UpdateServicePrimaryTaskSet",
+          "ecs:TagResource"
         ]
 
         Resource = "*"
