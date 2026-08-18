@@ -71,6 +71,20 @@ resource "aws_ecs_task_definition" "application" {
         }
       ]
 
+      healthCheck = {
+        command = [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/health', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))"
+        ]
+
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 30
+      }
+
       logConfiguration = {
         logDriver = "awslogs"
 
